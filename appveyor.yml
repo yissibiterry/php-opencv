@@ -1,0 +1,57 @@
+version: 1.0.{build}
+image: Visual Studio 2019
+
+environment:
+  matrix:
+    - PHP_VERSION: "8.1"
+      ARCH: "x86"
+      THREAD: "nts"
+    - PHP_VERSION: "8.1"
+      ARCH: "x64"
+      THREAD: "ts"
+
+install:
+  # Installer PHP correspondant à la version, l'architecture et le type de thread
+  - ps: |
+      $phpBase = "https://windows.php.net/downloads/releases"
+      $phpFile = "php-${env:PHP_VERSION}-${env:THREAD}-Win32-vs16-${env:ARCH}.zip"
+      $phpUrl = "$phpBase/$phpFile"
+      $phpFolder = "C:\php-${env:PHP_VERSION}-${env:ARCH}-${env:THREAD}"
+      
+      Write-Host "Téléchargement de PHP depuis $phpUrl"
+      Invoke-WebRequest -Uri $phpUrl -OutFile php.zip
+      Expand-Archive php.zip -DestinationPath $phpFolder
+
+      Write-Host "Ajout de PHP à PATH"
+      $env:PATH = "$phpFolder;$phpFolder\ext;$env:PATH"
+
+  # Installer OpenCV et autres dépendances
+  - ps: |
+      Write-Host "Téléchargement de OpenCV"
+      $opencvBase = "https://github.com/opencv/opencv/releases/download/4.5.5"
+      $opencvFile = "opencv-4.5.5-vc14_vc15_vc16.exe"
+      $opencvUrl = "$opencvBase/$opencvFile"
+      Invoke-WebRequest -Uri $opencvUrl -OutFile opencv.exe
+      Start-Process -FilePath opencv.exe -ArgumentList "/S /D=C:\OpenCV" -Wait
+
+      Write-Host "Ajout de OpenCV à PATH"
+      $env:PATH = "C:\OpenCV\build\x64\vc16\bin;$env:PATH"
+
+build_script:
+  # Compiler l'extension php-opencv
+  - cmd: |
+      phpize
+      configure --with-opencv-dir="C:\OpenCV"
+      nmake
+      nmake install
+
+test_script:
+  # Vérifiez que l'extension est correctement installée
+  - cmd: |
+      echo "extension=php_opencv.dll" >> %PHPRC%\php.ini
+      php -m | findstr opencv
+
+artifacts:
+  # Publier les fichiers DLL compilés
+  - path: "Release/*.dll"
+    name: "php-opencv-${env:PHP_VERSION}-${env:ARCH}-${env:THREAD}"

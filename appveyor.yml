@@ -27,7 +27,7 @@ install:
   # Télécharger et configurer OpenCV
   - ps: |
       Write-Host "Téléchargement de OpenCV"
-      $opencvBase = "https://github.com/opencv/opencv/releases/download/4.5.5"
+      $opencvBase = "https://github.com/opencv/opencv/releases/download/4.5.5/opencv-4.5.5-vc14_vc15.exe"
       $opencvFile = "opencv-4.5.5-vc14_vc15_vc16.exe"
       $opencvUrl = "$opencvBase/$opencvFile"
       Invoke-WebRequest -Uri $opencvUrl -OutFile opencv.exe

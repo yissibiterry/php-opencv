@@ -1,6 +1,8 @@
 version: 1.0.{build}
 image: Visual Studio 2019
 
+build: off  # Désactive le mode MSBuild par défaut
+
 environment:
   matrix:
     - PHP_VERSION: "8.1"
@@ -11,7 +13,7 @@ environment:
       THREAD: "ts"
 
 install:
-  # Installer PHP correspondant à la version, l'architecture et le type de thread
+  # Télécharger PHP selon la version, l'architecture et le type de thread
   - ps: |
       $phpBase = "https://windows.php.net/downloads/releases"
       $phpFile = "php-${env:PHP_VERSION}-${env:THREAD}-Win32-vs16-${env:ARCH}.zip"
@@ -25,7 +27,7 @@ install:
       Write-Host "Ajout de PHP à PATH"
       $env:PATH = "$phpFolder;$phpFolder\ext;$env:PATH"
 
-  # Installer OpenCV et autres dépendances
+  # Télécharger et configurer OpenCV
   - ps: |
       Write-Host "Téléchargement de OpenCV"
       $opencvBase = "https://github.com/opencv/opencv/releases/download/4.5.5"
@@ -46,7 +48,7 @@ build_script:
       nmake install
 
 test_script:
-  # Vérifiez que l'extension est correctement installée
+  # Vérifier que l'extension est correctement installée
   - cmd: |
       echo "extension=php_opencv.dll" >> %PHPRC%\php.ini
       php -m | findstr opencv

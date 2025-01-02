@@ -14,7 +14,7 @@ install:
   - ps: |
       $phpBase = "https://windows.php.net/downloads/releases"
       $phpFile = "php-${env:PHP_VERSION}-${env:THREAD}-Win32-vs16-${env:ARCH}.zip"
-      $phpUrl = "$phpBase/$phpFile"
+      $phpUrl = "https://windows.php.net/downloads/releases/php-8.1.31-Win32-vs16-x64.zip"
       $phpFolder = "C:\php-${env:PHP_VERSION}-${env:ARCH}-${env:THREAD}"
       
       Write-Host "Téléchargement de PHP depuis $phpUrl"

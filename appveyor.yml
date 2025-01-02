@@ -5,7 +5,7 @@ build: off  # Désactive le mode MSBuild par défaut
 
 environment:
   matrix:
-        - PHP_VERSION: "8.1"
+      PHP_VERSION: "8.1"
       ARCH: "x64"
       THREAD: "ts"
 
